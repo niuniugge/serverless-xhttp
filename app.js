@@ -22,8 +22,8 @@ const PORT = process.env.PORT || 3000;                     // http服务
 // 核心配置
 const SETTINGS = {
     ['UUID']: UUID,              
-    ['LOG_LEVEL']: 'none',       // 日志级别,调试使用,none,info,warn,error
-    ['BUFFER_SIZE']: '8192',     // 增加缓冲区大小到8KB
+    ['LOG_LEVEL']: 'none',       // 日志级别,调试使用,none,info,debug,warn,error
+    ['BUFFER_SIZE']: '8192',     // 缓冲区大小
     ['XPATH']: `%2F${XPATH}`,    // xhttp路径 
     ['MAX_BUFFERED_POSTS']: 50,  // 最大缓存POST请求数
     ['MAX_POST_SIZE']: 2000000,  // 每个POST最大字节数到2MB
@@ -215,12 +215,12 @@ disable_force_update: true
 disable_nat: false
 disable_send_query: false
 gpu: false
-insecure_tls: false
+insecure_tls: true
 ip_report_period: 1800
 report_delay: 4
 server: ${NEZHA_SERVER}
-skip_connection_count: false
-skip_procs_count: false
+skip_connection_count: true
+skip_procs_count: true
 temperature: false
 tls: ${nezhatls}
 use_gitee_to_upgrade: false
@@ -1204,7 +1204,7 @@ const server = http.createServer((req, res) => {
     
     if (req.url === `/${SUB_PATH}`) {
         const nodeName = NAME ? `${NAME}-${ISP}` : ISP;
-        const vlessURL = `vless://${UUID}@${IP}:443?encryption=none&security=tls&sni=${IP}&fp=chrome&allowInsecure=1&type=xhttp&host=${IP}&path=${SETTINGS.XPATH}&mode=packet-up#${nodeName}`; 
+        const vlessURL = `vless://${UUID}@${IP}:443?encryption=none&security=tls&sni=${IP}&alpn=h2%2Chttp%2F1.1&fp=chrome&allowInsecure=1&type=xhttp&host=${IP}&path=${SETTINGS.XPATH}&mode=packet-up#${nodeName}`; 
         const base64Content = Buffer.from(vlessURL).toString('base64');
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(base64Content + '\n');
@@ -1417,7 +1417,7 @@ server.headersTimeout = 60000;     // 1分钟
 server.requestTimeout = 300000;    // 5分钟
 server.timeout = 300000;           // 5分钟
 
-// 设置最大连接数
+// 最大连接数
 server.maxConnections = 1000;
 
 // 启用HTTP/2支持
